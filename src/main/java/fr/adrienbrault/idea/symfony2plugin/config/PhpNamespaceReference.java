@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class PhpNamespaceReference extends PsiPolyVariantReferenceBase<PsiElement> {
 
-    private static final String NAMESPACE_SEPARATOR = "\\";
+    private static final String NAMESPACE_SEGMENT_SEPARATOR = "\\";
 
     @NotNull
     private final String namespaceFQN;
@@ -28,11 +28,11 @@ public class PhpNamespaceReference extends PsiPolyVariantReferenceBase<PsiElemen
     }
 
     private String normalizeFQN(String fqn) {
-        if (!fqn.startsWith(NAMESPACE_SEPARATOR)) {
-            fqn = NAMESPACE_SEPARATOR + fqn;
+        if (!fqn.startsWith(NAMESPACE_SEGMENT_SEPARATOR)) {
+            fqn = NAMESPACE_SEGMENT_SEPARATOR + fqn;
         }
 
-        if (fqn.endsWith(NAMESPACE_SEPARATOR)) {
+        if (fqn.endsWith(NAMESPACE_SEGMENT_SEPARATOR)) {
             fqn = fqn.substring(0, fqn.length() - 1);
         }
 
