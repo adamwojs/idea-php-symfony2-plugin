@@ -295,6 +295,14 @@ public class YamlElementPatternHelper {
             );
     }
 
+    public static ElementPattern<? extends PsiElement> getServicesKeyPatternEx() {
+        return PlatformPatterns.psiElement(YAMLKeyValue.class).withParent(
+            PlatformPatterns.psiElement(YAMLMapping.class).withParent(
+                PlatformPatterns.psiElement(YAMLKeyValue.class).with(YAML_KEY_SERVICES)
+            )
+        );
+    }
+
     /**
      * Proxy for getWithFirstRootKey to filter with file name condition
      */

@@ -2,6 +2,7 @@ package fr.adrienbrault.idea.symfony2plugin.config;
 
 import com.intellij.codeInsight.completion.impl.CamelHumpMatcher;
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiPolyVariantReferenceBase;
@@ -42,6 +43,11 @@ public class PhpClassReference extends PsiPolyVariantReferenceBase<PsiElement> {
     public PhpClassReference(@NotNull PsiElement element, String classFQN, boolean provideVariants) {
         this(element, classFQN);
         this.provideVariants = provideVariants;
+    }
+
+    public PhpClassReference(@NotNull PsiElement element, String classFQN, @NotNull TextRange range) {
+        super(element, range);
+        this.classFQN = classFQN;
     }
 
     public PhpClassReference(@NotNull StringLiteralExpression element, boolean provideVariants) {
@@ -126,5 +132,4 @@ public class PhpClassReference extends PsiPolyVariantReferenceBase<PsiElement> {
         this.useClasses = useClasses;
         return this;
     }
-
 }
