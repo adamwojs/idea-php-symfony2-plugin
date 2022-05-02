@@ -8,11 +8,10 @@ import com.intellij.util.ProcessingContext;
 import fr.adrienbrault.idea.symfony2plugin.Symfony2ProjectComponent;
 import fr.adrienbrault.idea.symfony2plugin.config.PhpClassReference;
 import fr.adrienbrault.idea.symfony2plugin.config.PhpNamespaceReference;
+import fr.adrienbrault.idea.symfony2plugin.config.ServiceReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.yaml.psi.YAMLKeyValue;
-import org.jetbrains.yaml.psi.YAMLMapping;
-import org.jetbrains.yaml.psi.YAMLScalar;
+import org.jetbrains.yaml.psi.*;
 
 import java.util.*;
 
@@ -71,6 +70,10 @@ public class YamlReferenceContributor extends PsiReferenceContributor {
 
         // services:
         //     My<caret>Class: ~
+
+        // services:
+        //     _instanceof:
+        //         My<caret>Class: ~
         registrar.registerReferenceProvider(
             PlatformPatterns
                 .psiElement(YAMLKeyValue.class)
@@ -94,6 +97,46 @@ public class YamlReferenceContributor extends PsiReferenceContributor {
                     }
 
                     return null;
+                }
+            }
+        );
+
+        // services:
+        //     app.service.foo:
+        //         arguments:
+        //             - '@app.service.bar<caret>'
+        registrar.registerReferenceProvider(
+            PlatformPatterns
+                .psiElement(YAMLScalar.class)
+                .withParent(
+                    PlatformPatterns
+                        .psiElement(YAMLSequenceItem.class)
+                        .withParent(
+                            PlatformPatterns
+                                .psiElement(YAMLSequence.class)
+                                .withParent(
+                                    PlatformPatterns.psiElement(YAMLKeyValue.class).withName("arguments")
+                                )
+                        )
+                ),
+            new PsiReferenceProvider() {
+                @Override
+                public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+                    if (!Symfony2ProjectComponent.isEnabled(element)) {
+                        return PsiReference.EMPTY_ARRAY;
+                    }
+
+                    if (element instanceof YAMLScalar) {
+                        var serviceName = ((YAMLScalar) element).getTextValue();
+
+                        if (serviceName.length() > 1 && serviceName.startsWith("@") && !serviceName.startsWith("@@")) {
+                            return new PsiReference[]{
+                                new ServiceReference(element, serviceName)
+                            };
+                        }
+                    }
+
+                    return PsiReference.EMPTY_ARRAY;
                 }
             }
         );
