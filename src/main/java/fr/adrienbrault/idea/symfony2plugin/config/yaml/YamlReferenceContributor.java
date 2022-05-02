@@ -11,6 +11,7 @@ import fr.adrienbrault.idea.symfony2plugin.config.PhpNamespaceReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
+import org.jetbrains.yaml.psi.YAMLMapping;
 import org.jetbrains.yaml.psi.YAMLScalar;
 
 import java.util.*;
@@ -71,7 +72,14 @@ public class YamlReferenceContributor extends PsiReferenceContributor {
         // services:
         //     My<caret>Class: ~
         registrar.registerReferenceProvider(
-            YamlElementPatternHelper.getServicesKeyPatternEx(),
+            PlatformPatterns
+                .psiElement(YAMLKeyValue.class)
+                .withParent(PlatformPatterns
+                    .psiElement(YAMLMapping.class)
+                    .withParent(PlatformPatterns
+                        .psiElement(YAMLKeyValue.class)
+                        .withName("services", "_instanceof"))
+                ),
             new ClassFQNPsiReferenceProvider() {
                 @Override
                 protected @Nullable String getClassFQNFromPsiElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
