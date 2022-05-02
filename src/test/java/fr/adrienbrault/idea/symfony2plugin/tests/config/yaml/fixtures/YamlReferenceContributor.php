@@ -12,7 +12,3 @@ namespace Foo
         const FOO = 'foo';
     }
 }
-
-namespace A\B\C {
-    class D {}
-}
